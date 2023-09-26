@@ -1,9 +1,14 @@
 const fs = require("fs")
+const Tour = require("../models/tourModel")
+
+const tours = JSON.parse(
+  fs.readFileSync(
+    `${__dirname}/../dev-data/data/tours-simple.json`
+  )
+)
 
 const checkId = (req, res, next, val) => {
-  const tour = tours.find(
-    (el) => el.id === parseInt(val)
-  )
+  const tour = Tour.find(req.params.id)
   if (!tour) {
     return res.status(404).json({
       status: "failed",
@@ -22,52 +27,59 @@ const checBody = (req, res, next) => {
   next()
 }
 
-const tours = JSON.parse(
-  fs.readFileSync(
-    `${__dirname}/../dev-data/data/tours-simple.json`
-  )
-)
-
-const getAllTours = (req, res) => {
-  res.status(200).json({
-    status: "sucess",
-    requestTime: req.requestTime,
-    data: tours,
-  })
+const getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find()
+    res.status(200).json({
+      status: "sucess",
+      requestTime: req.requestTime,
+      length: tours.length,
+      data: tours,
+    })
+  } catch (err) {
+    res.status(404).json({
+      status: "failed",
+      requestTime: req.requestTime,
+    })
+  }
 }
 
-const getTourById = (req, res) => {
-  const id = parseInt(req.params.id)
-  const tour = tours.find((el) => el.id === id)
-
-  res.status(200).json({
-    status: "sucess",
-    data: tour,
-  })
+const getTourById = async (req, res) => {
+  try {
+    const tours = await Tour.findById(
+      req.params.id
+    )
+    res.status(200).json({
+      status: "sucess",
+      requestTime: req.requestTime,
+      length: tours.length,
+      data: tours,
+    })
+  } catch (err) {
+    res.status(404).json({
+      status: "failed",
+      requestTime: req.requestTime,
+    })
+  }
 }
 
-const createTour = (req, res) => {
+const createTour = async (req, res) => {
   // generate id for new data
-  const newId = tours[tours.length - 1].id + 1
+  try {
+    const newData = await Tour.create(req.body)
 
-  const newData = Object.assign(
-    { id: newId },
-    req.body
-  )
-
-  tours.push(newData)
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          tour: newData,
-        },
-      })
-    }
-  )
+    res.status(201).json({
+      status: "success",
+      data: {
+        tour: newData,
+      },
+    })
+  } catch (err) {
+    res.status(201).json({
+      status: "failed",
+      message: err,
+    })
+  }
 }
 
 const editTour = (req, res) => {
@@ -75,13 +87,6 @@ const editTour = (req, res) => {
   const tourIndex = tours.findIndex(
     (el) => el.id === id
   )
-
-  //   if (!tourIndex === -1) {
-  //     return res.status(404).json({
-  //       status: "failed",
-  //       message: `Data with id ${id} not found`,
-  //     })
-  //   }
   tours[tourIndex] = {
     ...tours[tourIndex],
     ...req.body,
@@ -106,14 +111,6 @@ const removeTour = (req, res) => {
   const tourIndex = tours.findIndex(
     (el) => el.id === id
   )
-
-  //   if (!tourIndex === -1) {
-  //     return res.status(404).json({
-  //       status: "failed",
-  //       message: `Data with id ${id} not found`,
-  //     })
-  //   }
-
   tours.splice(tourIndex, 1)
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
