@@ -6,7 +6,7 @@ const router = express.Router()
 
 // routes toures
 
-router.param("id", tourController.checkId)
+// router.param("id", tourController.checkId)
 
 router
   .route("/")

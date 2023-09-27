@@ -94,12 +94,6 @@ const editTour = async (req, res) => {
       update,
       { new: true }
     )
-    // if (!newTour) {
-    //   return res.status(404).json({
-    //     status: "failed",
-    //     message: `data with id ${req.params.id} not found`,
-    //   })
-    // }
     res.status(201).json({
       status: "success",
       data: {
@@ -109,7 +103,7 @@ const editTour = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "failed",
-      message: err.message,
+      message: err,
     })
   }
 }
