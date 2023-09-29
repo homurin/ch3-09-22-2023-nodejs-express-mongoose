@@ -1,9 +1,11 @@
 const mongoose = require("mongoose")
+const dotenv = require("dotenv")
+dotenv.config()
 const app = require("./app")
 const PORT = process.env.PORT || 3000
 
-const database = "mongodb://127.0.0.1:27017/tours"
-
+const database = process.env.DATABASE_URL
+console.info(database)
 mongoose
   .connect(database, {
     useNewUrlParser: true,
@@ -13,14 +15,7 @@ mongoose
       "database successfully connected"
     )
   )
-
-// const testTour = new Tour({
-//   name: "arch",
-//   rating: 4,
-//   price: 10000,
-// })
-
-// testTour.save()
+  .catch((err) => console.info(err))
 
 app.listen(PORT, () => {
   console.info(

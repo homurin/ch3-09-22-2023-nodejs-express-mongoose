@@ -1,36 +1,22 @@
 const express = require("express")
 const tourController = require("../controllers/toursController")
-const createTour = require("../models/tourModel")
-// const createTour = require("../models/tourModel")
+const checkBody = require("../middleware/checkBody")
+const checkId = require("../middleware/checkId")
 const router = express.Router()
 
 // routes toures
 
-// router.param("id", tourController.checkId)
+router.param("id", checkId)
 
 router
   .route("/")
   .get(tourController.getAllTours)
-  .post(
-    tourController.checBody,
-    tourController.createTour
-  )
-router
-  .route("/model")
-  .get(tourController.getAllTours)
-  .post(tourController.createTour)
-
-router
-  .route("/model/:id")
-  .get(tourController.getTourById)
+  .post(checkBody, tourController.createTour)
 
 router
   .route("/:id")
   .get(tourController.getTourById)
-  .patch(
-    tourController.checBody,
-    tourController.editTour
-  )
+  .patch(checkBody, tourController.editTour)
   .delete(tourController.removeTour)
 
 module.exports = router

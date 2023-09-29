@@ -1,11 +1,4 @@
-const fs = require("fs")
 const Tour = require("../models/tourModel")
-
-const tours = JSON.parse(
-  fs.readFileSync(
-    `${__dirname}/../dev-data/data/tours-simple.json`
-  )
-)
 
 const checkId = async (req, res, next, val) => {
   try {
@@ -19,15 +12,6 @@ const checkId = async (req, res, next, val) => {
       message: `Data with id ${val} not found`,
     })
   }
-}
-const checBody = (req, res, next) => {
-  if (!req.body.name && !req.body.price) {
-    return res.status(404).json({
-      status: "failed",
-      message: `name or price is required`,
-    })
-  }
-  next()
 }
 
 const getAllTours = async (req, res) => {
@@ -80,7 +64,8 @@ const createTour = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "failed",
-      message: err,
+      message: "gagal post",
+      errorMessage: err,
     })
   }
 }
@@ -113,12 +98,6 @@ const removeTour = async (req, res) => {
     const id = req.params.id
     const deleteTour =
       await Tour.findByIdAndDelete(id)
-    // if (!deleteTour) {
-    //   return res.status(404).json({
-    //     status: "failed",
-    //     message: `data with id ${req.params.id} not found`,
-    //   })
-    // }
     res.status(201).json({
       status: "success",
       data: {
@@ -135,7 +114,6 @@ const removeTour = async (req, res) => {
 
 module.exports = {
   checkId,
-  checBody,
   getAllTours,
   getTourById,
   createTour,
